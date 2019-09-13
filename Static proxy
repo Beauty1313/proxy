@@ -1,0 +1,74 @@
+/**
+ * 代理类和被代理类公共的接口
+ * @author TYX
+ *
+ */
+public interface Person {
+   //上交班费
+   void getMoney();
+
+}
+
+/**
+ * 定义一个被代理的类，继承公共接口
+ * @author TYX
+ *
+ */
+public class Student implements Person {
+
+   private String name;
+   
+   public Student(String name) {
+      super();
+      this.name = name;
+   }
+
+   @Override
+   public void getMoney() {
+      System.out.println("上交班费50元");
+
+   }
+
+}
+
+/**
+ * 静态代理在程序运行之前已经编译好了。
+ * 代理类，类中定义一个被代理类的实体，还有代理的行为
+ * @author TYX
+ *
+ */
+public class StudentProxy implements Person {
+
+   //定义一个被代理类的对象
+   Student student;
+   
+   //这个构造器传入的是一个接口的对象
+   public StudentProxy(Person student2) {
+      //只代理student这个类
+      if(student2.getClass() == Student.class){
+         this.student = (Student) student2;
+      }
+   }
+
+   //代理上交班费
+   @Override
+   public void getMoney() {
+      
+      System.out.println("最近这位同学表现很好哦~");
+      student.getMoney();
+
+   }
+
+}
+
+public class TestStaticProxy {
+
+   public static void main(String[] args) {
+      
+      Person student = new Student("张三");
+     
+      Person moniter = new StudentProxy(student);
+
+      moniter.getMoney();
+   }
+}
