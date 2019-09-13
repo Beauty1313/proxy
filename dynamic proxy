@@ -1,0 +1,93 @@
+public interface Person {
+   //上交班费
+   void getMoney();
+
+}
+
+/**
+ * 定义一个被代理的类，继承公共接口
+ * @author TYX
+ *
+ */
+public class Student implements Person {
+
+   private String name;
+   
+   public Student(String name) {
+      super();
+      this.name = name;
+   }
+
+   //定义一个方法执行时间的方法
+   @Override
+   public void getMoney() {
+      try {
+         Thread.sleep(1000);
+      } catch (InterruptedException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      System.out.println("上交班费50元");
+
+   }
+
+}
+
+/**
+ * 动态代理实现
+ * 类中有一个被代理类的实例，所有执行代理对象的方法都会被替换成执行invock方法
+ * @author TYX
+ *
+ */
+public class StudentProxyHandler<T> implements InvocationHandler {
+   //定义一个被代理类的对象
+   private T targe;
+   
+   public StudentProxyHandler(T targe) {
+      super();
+      this.targe = targe;
+   }
+
+   /**
+    * proxy 是被代理对象（实例）
+    * method 正在执行的方法
+    * args 调用目标方法时传入的实参
+    */
+   @Override
+   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      System.out.println("代理执行" + method.getName() + "方法");
+      MonitorUtil.start();
+      Object result = method.invoke(targe, args);
+      MonitorUtil.finish(method.getName());
+      return result;
+   }
+   
+   public Object proxyInstance(){
+      return Proxy.newProxyInstance(targe.getClass().getClassLoader(), targe.getClass().getInterfaces(), this);
+   }
+
+}
+
+
+public class TestDynamicProxy {
+
+   public static void main(String[] args) throws NoSuchMethodException, SecurityException {
+//    Person student = new Student("张三");
+    
+      Person student1 = new Student1("李四");
+     
+      InvocationHandler stuHandler = new StudentProxyHandler<Person>(student1);
+      
+      Person stuProxy = (Person) Proxy.newProxyInstance(Person.class.getClassLoader(), new Class<?>[]{Person.class}, stuHandler);
+
+      stuProxy.getMoney();
+      
+      /*Person student1 = new Student1("李四");
+
+      StudentProxyHandler stuHandler = new StudentProxyHandler<Person>(student1);
+      
+      Person stuProxy = (Person) stuHandler.proxyInstance();
+ 
+      stuProxy.getMoney();*/
+   }
+}
